@@ -87,10 +87,6 @@ public class LibraryAndroidDemoActivity extends Activity implements AdListener
         
         //Add the content view to the curent view.
         addContentView(lib, lib.getLayoutParams());
-        
-        //Begin loading ads.
-        lib.loadAd(req);
-        
     }
     
     /**
