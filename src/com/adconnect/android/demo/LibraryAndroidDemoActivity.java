@@ -31,6 +31,23 @@ public class LibraryAndroidDemoActivity extends Activity implements AdListener
 	private static final String LOG_TAG = "AdConnectLibraryAndroidDemo";
 	
 	//Adconnect library object.
+	
+	/*
+	 * This is the activation rate of the library.
+	 * Some developers might wish to only use our library
+	 * for a percentage of their inventory. The activation
+	 * rate is this percentage (out of 100).
+	 * 
+	 * An activation rate of 50 means that the developer
+	 * wishes to use our library for only 50% of their users.
+	 * 
+	 * An activation rate of 30 means that the developer 
+	 * wishes to use our library for only 30% of their users.
+	 * 
+	 * This is accomplished through the AdBlock.doActivate(double activationRate)
+	 * method.
+	 */
+	private static final double ADCONNECT_ACTIVATION_RATE = 50;
 	private AdBlock lib;
 	private AdRequest req;
 	private boolean isTest = true;
@@ -51,8 +68,32 @@ public class LibraryAndroidDemoActivity extends Activity implements AdListener
         //of the res folder.
         setContentView(R.layout.main);
         
-        //Create the library for this activity
-        
+        //Initialize the adConnect library
+        initAdConnectLibrary();
+    }
+    
+    /**
+     * This method is used to initialize the adConnect library for use by this activity.
+     */
+    private void initAdConnectLibrary()
+    {
+    	/*
+    	 * We first check to see if we should continue with creating the AdConnect Library.
+    	 * 
+    	 * If AdBlock.doActivate(ADCONNECT_ACTIVATION_RATE) is false, 
+    	 * 
+    	 * we should use another Ad library vendor and return.
+    	 */
+    	if(!AdBlock.doActivate(ADCONNECT_ACTIVATION_RATE))
+    	{
+    		Log.d(LOG_TAG, "Activation rate does not allow for the creation of the library.");
+    		useAnotherAdLibraryVendor();
+    		return;
+    	}
+    	
+    	Log.d(LOG_TAG, "Activation rate DOES allow for the creation of the library.");
+    	
+    	//Create the library for this activity
         //The constructor for the AdBlock object is:
         //AdBlock(context, AdSize.TYPE, publisher_id)
         lib = new AdBlock(this, AdSize.BANNER, "12345");
@@ -89,6 +130,11 @@ public class LibraryAndroidDemoActivity extends Activity implements AdListener
         addContentView(lib, lib.getLayoutParams());
     }
     
+    private void useAnotherAdLibraryVendor()
+    {
+    	//Stuff
+    }
+    
     /**
      * Called when the activity is resumed.
      * 
@@ -100,16 +146,18 @@ public class LibraryAndroidDemoActivity extends Activity implements AdListener
     {
         super.onResume();
         
+        if(lib == null)
+        {
+        	return;
+        }
+        
         if(req == null)
     	{
     		req = new AdRequest();
     		req.setTestMode(isTest);
     	}
-   
-        if(lib != null)
-        {
-        	lib.loadAd(req);
-        }
+        
+        lib.loadAd(req);
     }
     
     /**
